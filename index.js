@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-import { input, select } from "@inquirer/prompts";
+import { input, select, checkbox } from "@inquirer/prompts";
 import fs from "fs";
 import path from "path";
 import os from 'os';
@@ -18,13 +18,40 @@ function createFolder(folderPath) {
   }
 }
 
+async function getAdditionalFolders() {
+  return checkbox({
+    message: "Select additional folders to create:",
+    choices: [
+      { name: "Projects & Research", value: "projects-research" },
+      { name: "Presentations", value: "presentations" },
+      { name: "Study Materials", value: "study-materials" },
+      { name: "Exams", value: "exams" },
+      { name: "General (Calendar & Deadlines, etc.)", value: "general" },
+    ],
+  });
+}
+
+function createAdditionalFolders(basePath, additionalFolders) {
+  additionalFolders.forEach(folder => {
+    if (folder === "general") {
+      const generalPath = path.join(basePath, "General");
+      createFolder(generalPath);
+      createFolder(path.join(generalPath, "Calendar & Deadlines"));
+    } else {
+      createFolder(path.join(basePath, folder));
+    }
+  });
+}
+
 // Function to create the folder structure
-function createSchoolFolders(baseDirectory, year, highSchoolYear, track, language) {
+function createSchoolFolders(baseDirectory, year, highSchoolYear, track, language, additionalFolders) {
   const yearPath = path.join(baseDirectory, year, highSchoolYear);
   createFolder(yearPath);
 
   const subjectsForYear = subjectsByTrack[highSchoolYear];
   const subjectsForTrack = track ? subjectsForYear[track] : subjectsForYear;
+
+  createAdditionalFolders(yearPath, additionalFolders);
 
   Object.keys(subjectsForTrack).forEach((semester) => {
     const semesterPath = path.join(yearPath, semester);
@@ -34,13 +61,21 @@ function createSchoolFolders(baseDirectory, year, highSchoolYear, track, languag
       const subjectName = subject[language]; // Choose the correct language
       const subjectPath = path.join(semesterPath, subjectName.trim());
       createFolder(subjectPath);
+
+      additionalFolders.forEach(folder => {
+        if (folder !== "general") {
+          createFolder(path.join(subjectPath, folder));
+        }
+      });
     });
   });
 }
 
-function createUniversityFolders(baseDirectory, year, semesterCount, subjects) {
+function createUniversityFolders(baseDirectory, year, semesterCount, subjects, additionalFolders) {
   const yearPath = path.join(baseDirectory, year);
   createFolder(yearPath);
+
+  createAdditionalFolders(yearPath, additionalFolders);
 
   for (let i = 1; i <= semesterCount; i++) {
     const semesterPath = path.join(yearPath, `Semester_${i}`);
@@ -49,6 +84,12 @@ function createUniversityFolders(baseDirectory, year, semesterCount, subjects) {
     subjects.forEach(subject => {
       const subjectPath = path.join(semesterPath, subject.trim());
       createFolder(subjectPath);
+
+      additionalFolders.forEach(folder => {
+        if (folder !== "general") {
+          createFolder(path.join(subjectPath, folder));
+        }
+      });
     });
   }
 }
@@ -101,7 +142,9 @@ async function handleHighSchool() {
     default: path.join(os.homedir(), 'Desktop'),
   });
 
-  createSchoolFolders(directory, schoolYear, highSchoolYear, highSchoolTrack, language);
+  const additionalFolders = await getAdditionalFolders();
+
+  createSchoolFolders(directory, schoolYear, highSchoolYear, highSchoolTrack, language, additionalFolders);
 }
 
 async function handleUniversity() {
@@ -151,7 +194,9 @@ async function handleUniversity() {
     default: path.join(os.homedir(), 'Desktop'),
   });
 
-  createUniversityFolders(directory, year, semesterCount, subjects);
+  const additionalFolders = await getAdditionalFolders();
+
+  createUniversityFolders(directory, year, semesterCount, subjects, additionalFolders);
 }
 
 async function run() {
