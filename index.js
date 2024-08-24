@@ -21,65 +21,47 @@ function createFolder(folderPath) {
 async function getAdditionalFolders(language) {
   const folderChoices = [
     {
-      name: language === "ar" ? "المشاريع والأبحاث" : "Projects & Research",
-      value: "projects-research",
+      name: "Projects & Research",
+      value: language === 'ar' ? "المشاريع والأبحاث" : "Projects & Research",
     },
     {
-      name: language === "ar" ? "العروض التقديمية" : "Presentations",
-      value: "presentations",
+      name: "Presentations",
+      value: language === 'ar' ? "العروض التقديمية" : "Presentations",
     },
     {
-      name: language === "ar" ? "المواد الدراسية" : "Study Materials",
-      value: "study-materials",
+      name: "Study Materials",
+      value: language === 'ar' ? "المواد الدراسية" : "Study Materials",
     },
     {
-      name: language === "ar" ? "الاختبارات" : "Exams",
-      value: "exams",
+      name: "Exams",
+      value: language === 'ar' ? "الاختبارات" : "Exams",
     },
     {
-      name:
-        language === "ar"
-          ? "عام (التقويم والمواعيد النهائية، إلخ)"
-          : "General (Calendar & Deadlines, etc.)",
-      value: "general",
+      name: "General (Calendar & Deadlines, etc.)",
+      value: language === 'ar' ? "عام" : "General",
     },
   ];
 
   return checkbox({
-    message:
-      language === "ar"
-        ? "حدد المجلدات الإضافية المراد إنشاؤها:"
-        : "Select additional folders to create:",
+    message: "Select additional folders to create:",
     choices: folderChoices,
   });
 }
 
+function getSemesterName(semester, language) {
+  if (language === 'ar') {
+    const arabicSemesters = ['الترم الأول', 'الترم الثاني', 'الترم الثالث'];
+    return arabicSemesters[semester - 1] || `الترم ${semester}`;
+  }
+  return `Semester_${semester}`;
+}
+
 function createAdditionalFolders(basePath, additionalFolders, language) {
-  additionalFolders.forEach((folder) => {
-    if (folder === "general") {
-      const generalPath = path.join(
-        basePath,
-        language === "ar" ? "عام" : "General"
-      );
+  additionalFolders.forEach(folder => {
+    if (folder === "عام" || folder === "General") {
+      const generalPath = path.join(basePath, folder);
       createFolder(generalPath);
-      createFolder(
-        path.join(
-          generalPath,
-          language === "ar"
-            ? "التقويم والمواعيد النهائية"
-            : "Calendar & Deadlines"
-        )
-      );
-    } else {
-      const folderName = {
-        "projects-research":
-          language === "ar" ? "المشاريع والأبحاث" : "Projects & Research",
-        presentations: language === "ar" ? "العروض التقديمية" : "Presentations",
-        "study-materials":
-          language === "ar" ? "المواد الدراسية" : "Study Materials",
-        exams: language === "ar" ? "الاختبارات" : "Exams",
-      }[folder];
-      createFolder(path.join(basePath, folderName));
+      createFolder(path.join(generalPath, language === 'ar' ? "التقويم والمواعيد النهائية" : "Calendar & Deadlines"));
     }
   });
 }
@@ -101,17 +83,17 @@ function createSchoolFolders(
 
   createAdditionalFolders(yearPath, additionalFolders, language);
 
-  Object.keys(subjectsForTrack).forEach((semester) => {
-    const semesterPath = path.join(yearPath, semester);
+  Object.keys(subjectsForTrack).forEach((semester, index) => {
+    const semesterPath = path.join(yearPath, getSemesterName(index + 1, language));
     createFolder(semesterPath);
 
     subjectsForTrack[semester].forEach((subject) => {
-      const subjectName = subject[language]; // Choose the correct language
+      const subjectName = subject[language];
       const subjectPath = path.join(semesterPath, subjectName.trim());
       createFolder(subjectPath);
 
       additionalFolders.forEach((folder) => {
-        if (folder !== "general") {
+        if (folder !== "عام" && folder !== "General") {
           createFolder(path.join(subjectPath, folder));
         }
       });
@@ -133,7 +115,7 @@ function createUniversityFolders(
   createAdditionalFolders(yearPath, additionalFolders, language);
 
   for (let i = 1; i <= semesterCount; i++) {
-    const semesterPath = path.join(yearPath, `Semester_${i}`);
+    const semesterPath = path.join(yearPath, getSemesterName(i, language));
     createFolder(semesterPath);
 
     subjects.forEach((subject) => {
@@ -141,7 +123,7 @@ function createUniversityFolders(
       createFolder(subjectPath);
 
       additionalFolders.forEach((folder) => {
-        if (folder !== "general") {
+        if (folder !== "عام" && folder !== "General") {
           createFolder(path.join(subjectPath, folder));
         }
       });
