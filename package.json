@@ -1,17 +1,33 @@
 {
-  "name": "maketermfile",
+  "name": "school-folders-creator",
   "version": "1.0.0",
-  "main": "main.js",
+  "main": "build/index.js",
+  "type": "module",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "ncc build index.js -o build",
+    "package": "pkg . -t node16-macos-arm64 --output dist/School-folders-Creator"
   },
   "dependencies": {
     "@inquirer/prompts": "^5.3.8",
-    "commander": "^12.1.0"
+    "@vercel/ncc": "^0.38.1"
+  },
+  "pkg": {
+    "targets": [
+      "node16-linux-x64",
+      "node16-macos-x64",
+      "node16-win-x64"
+    ],
+    "output": "dist/School-folders-Creator"
+  },
+  "bin": {
+    "school-folders-creator": "./build/index.js"
   },
   "keywords": [],
-  "author": "",
+  "author": "Mohammed alaa",
   "license": "ISC",
   "description": "",
-  "type": "module"
+  "engines": {
+    "node": ">=16"
+  }
 }

@@ -259,15 +259,15 @@ async function handleUniversity() {
 }
 
 async function run() {
-  const isUniversity = await select({
-    message: "Are you a university student?",
+  const educationType = await select({
+    message: "What type of educational institution are you in?",
     choices: [
-      { name: "Yes", value: true },
-      { name: "No", value: false },
+      { name: "University", value: "university" },
+      { name: "High School", value: "school" },
     ],
   });
 
-  if (isUniversity) {
+  if (educationType === "university") {
     await handleUniversity();
   } else {
     await handleHighSchool();
