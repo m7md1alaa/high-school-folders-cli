@@ -3,30 +3,33 @@
   "version": "1.0.0",
   "main": "build/index.js",
   "type": "module",
+  "bin": {
+    "school-folders-creator": "./build/index.js"
+  },
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
     "build": "ncc build index.js -o build",
-    "package": "pkg . -t node16-macos-arm64 --output dist/School-folders-Creator"
+    "package": "pkg . -t node16-macos-arm64,node16-macos-x64,node16-win-x64 --output dist/school-folders-creator"
   },
   "dependencies": {
     "@inquirer/prompts": "^5.3.8",
-    "@vercel/ncc": "^0.38.1"
+    "commander": "^12.1.0"
+  },
+  "devDependencies": {
+    "@vercel/ncc": "^0.38.1",
+    "pkg": "^5.8.1"
   },
   "pkg": {
     "targets": [
-      "node16-linux-x64",
+      "node16-macos-arm64",
       "node16-macos-x64",
       "node16-win-x64"
     ],
-    "output": "dist/School-folders-Creator"
-  },
-  "bin": {
-    "school-folders-creator": "./build/index.js"
+    "outputPath": "dist"
   },
   "keywords": [],
   "author": "Mohammed alaa",
   "license": "ISC",
-  "description": "",
+  "description": "CLI tool for creating organized folder structures for students",
   "engines": {
     "node": ">=16"
   }

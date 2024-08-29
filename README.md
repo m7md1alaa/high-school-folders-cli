@@ -14,7 +14,32 @@ School Folder Creator is a command-line tool designed to help students organize 
 
 ## Installation
 
+### macOS
 
+Using Homebrew:
+
+```bash
+brew tap mohammedalaa111/school-folders-creator
+brew install school-folders-creator
+```
+
+### Windows
+
+Run the following command in PowerShell:
+
+
+## Usage
+
+To run the tool, use the following command in your terminal:
+
+
+### Linux
+
+Using apt:
+
+```bash
+sudo apt-get install school-folders-creator
+```
 
 ## Usage
 
